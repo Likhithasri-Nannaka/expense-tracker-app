@@ -25,18 +25,19 @@ const AuthForm = () => {
     event.preventDefault();
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
-    const checkPassword = checkPasswordInputRef.current.value;
+    const checkPassword = checkPasswordInputRef.current?.value;
     setIsLoading(true);
     let url;
-    if (isLogin && enteredPassword !== checkPassword) {
+    if (!isLogin && enteredPassword !== checkPassword) {
       alert("Passwords did not match");
       setIsLoading(false);
       return;
     }
-    if (isLogin && enteredPassword === checkPassword) {
+    if (isLogin) {
       url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyABeIBY3N4MdMe1Qgj7rhDCW0whYVK6ug4";
-    } else {
+    }
+    if (!isLogin && enteredPassword === checkPassword) {
       url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyABeIBY3N4MdMe1Qgj7rhDCW0whYVK6ug4";
     }
@@ -100,15 +101,17 @@ const AuthForm = () => {
                 style={{ width: "100%", marginTop: "15px" }}
               />
             </Form.Group>
-            <Form.Group controlId="formBasicPassword">
-              <Form.Control
-                type="password"
-                placeholder="Confirm Password"
-                ref={checkPasswordInputRef}
-                required
-                style={{ width: "100%", marginTop: "15px" }}
-              />
-            </Form.Group>
+            {!isLogin && (
+              <Form.Group controlId="formBasicPassword">
+                <Form.Control
+                  type="password"
+                  placeholder="Confirm Password"
+                  ref={checkPasswordInputRef}
+                  required
+                  style={{ width: "100%", marginTop: "15px" }}
+                />
+              </Form.Group>
+            )}
             {!isLoading ? (
               <Button
                 variant="primary"
@@ -128,14 +131,22 @@ const AuthForm = () => {
           {isLogin ? (
             <>
               {sign_up_text}{" "}
-              <Button variant="link" onClick={switchAuthModeHandler}>
+              <Button
+                variant="link"
+                style={{ padding: "0", marginBottom: "5px" }}
+                onClick={switchAuthModeHandler}
+              >
                 Sign Up
               </Button>
             </>
           ) : (
             <>
               {login_text}{" "}
-              <Button variant="link" onClick={switchAuthModeHandler}>
+              <Button
+                variant="link"
+                style={{ padding: "0", marginBottom: "5px" }}
+                onClick={switchAuthModeHandler}
+              >
                 Login
               </Button>
             </>
