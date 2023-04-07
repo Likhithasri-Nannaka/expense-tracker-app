@@ -1,92 +1,115 @@
-import { Fragment, useState } from "react";
-import { Container, Form, Button, Table } from "react-bootstrap";
+import { useContext, useState, useEffect } from "react";
+import { Container, Form, Button } from "react-bootstrap";
+import AuthContext from "../Store/AuthContext";
 
 const ExpenseForm = () => {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
-  const [date, setDate] = useState("");
-  const [expenses, setExpenses] = useState([]);
+  const [desc, setDesc] = useState("");
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const newExpense = {
-      title: title,
-      amount: amount,
-      date: date,
-    };
-    setExpenses([...expenses, newExpense]);
-    setTitle("");
-    setAmount("");
-    setDate("");
-  };
+  const authCtx = useContext(AuthContext);
 
-  const handleTitleChange = (event) => {
+  const titleChangeHandler = (event) => {
     setTitle(event.target.value);
   };
 
-  const handleAmountChange = (event) => {
+  const amountChangeHandler = (event) => {
     setAmount(event.target.value);
   };
 
-  const handleDateChange = (event) => {
-    setDate(event.target.value);
+  const descChangeHandler = (event) => {
+    setDesc(event.target.value);
   };
 
+  const submitHandler = (event) => {
+    event.preventDefault();
+
+    const expenseData = {
+      title: title,
+      amount: amount,
+      desc: desc,
+    };
+    addExpenseHandler(expenseData);
+    setTitle("");
+    setAmount("");
+    setDesc("");
+  };
+
+  const email = authCtx.email.replace(/[^a-zA-Z0-9]/g, "");
+
+  useEffect(() => {
+    fetch(
+      `https://expense-tracker-999-default-rtdb.asia-southeast1.firebasedatabase.app/expenses${email}.json`,
+      {
+        method: "POST",
+        body: JSON.stringify([]),
+      }
+    );
+  }, [email]);
+
+  const addExpenseHandler = async (expenseData) => {
+    const response = fetch(
+      `https://expense-tracker-999-default-rtdb.asia-southeast1.firebasedatabase.app/expenses${email}.json`,
+      {
+        method: "POST",
+        body: JSON.stringify(expenseData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Could not add expense.");
+    }
+  };
   return (
-    <Fragment>
-      <Container className="d-flex justify-content-center">
-        <Form
-          onSubmit={handleSubmit}
-          style={{ marginRight: "10%", marginTop: "2%" }}
-        >
-          <Form.Group controlId="title">
-            <Form.Label>Enter Title</Form.Label>
-            <Form.Control
-              type="text"
-              value={title}
-              onChange={handleTitleChange}
-            />
-          </Form.Group>
-          <Form.Group controlId="amount">
-            <Form.Label>Enter Amount</Form.Label>
-            <Form.Control
-              type="number"
-              value={amount}
-              onChange={handleAmountChange}
-            />
-          </Form.Group>
-          <Form.Group controlId="date">
-            <Form.Label>Select Date</Form.Label>
-            <Form.Control
-              type="date"
-              value={date}
-              onChange={handleDateChange}
-            />
-          </Form.Group>
-          <Button variant="primary" type="submit" style={{ marginTop: "15px" }}>
-            Add Expense
-          </Button>
-        </Form>
-        <Table bordered hover style={{ marginTop: "4%" }}>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Amount</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {expenses.map((expense, index) => (
-              <tr key={index}>
-                <td>{expense.title}</td>
-                <td>$ {expense.amount}</td>
-                <td>{expense.date}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </Container>
-    </Fragment>
+    <Container>
+      <h3
+        className="d-flex justify-content-center"
+        style={{ marginTop: "15px", backgroundColor: "red", color: "white" }}
+      >
+        Expense Form
+      </h3>
+      <Form className="d-flex justify-content-center">
+        <Form.Group style={{ marginRight: "15px" }}>
+          <Form.Label>Title</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter title"
+            value={title}
+            onChange={titleChangeHandler}
+            required
+          />
+        </Form.Group>
+        <Form.Group style={{ marginRight: "15px" }}>
+          <Form.Label>Amount</Form.Label>
+          <Form.Control
+            type="number"
+            placeholder="Enter amount"
+            value={amount}
+            onChange={amountChangeHandler}
+            required
+          />
+        </Form.Group>
+        <Form.Group style={{ marginRight: "15px" }}>
+          <Form.Label>Description</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter description"
+            value={desc}
+            onChange={descChangeHandler}
+          />
+        </Form.Group>
+      </Form>
+      <Button
+        variant="primary"
+        type="submit"
+        onClick={submitHandler}
+        style={{ marginLeft: "44%", marginTop: "15px", marginBottom: "15px" }}
+      >
+        Add Expense
+      </Button>
+    </Container>
   );
 };
 
