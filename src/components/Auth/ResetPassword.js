@@ -1,6 +1,10 @@
+import { Fragment } from "react";
 import { useState, useRef } from "react";
 import { Form, Container, Card, Button, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import Header from "../Layout/Header";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Reset = () => {
   const navigate = useNavigate();
@@ -12,7 +16,7 @@ const Reset = () => {
     event.preventDefault();
     setIsLoading(true);
     fetch(
-      "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyABeIBY3N4MdMe1Qgj7rhDCW0whYVK6ug4",
+      "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyDvtlwqxzVKhuhWBcSJE6AmKab0x5J45eA",
       {
         method: "POST",
         body: JSON.stringify({
@@ -35,15 +39,29 @@ const Reset = () => {
             if (data && data.error && data.error.message) {
               errorMessage = data.error.message;
             }
-            throw new Error(errorMessage);
+            toast.error(errorMessage, {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: false,
+              draggable: true,
+              progress: undefined,
+            });
           });
         }
       })
       .then((data) => {
+        toast.success("Password Link Sent", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
         navigate("/auth");
-      })
-      .catch((err) => {
-        alert(err.message);
       });
   };
 
@@ -52,41 +70,44 @@ const Reset = () => {
   };
 
   return (
-    <Container className="d-flex justify-content-center my-5">
-      <Card>
-        <Card.Title style={{ textAlign: "center", marginTop: "15px" }}>
-          Reset Password
-        </Card.Title>
-        <Card.Body>
-          <Form onSubmit={resetHandler}>
-            <Form.Group controlId="formBasicEmail">
-              <Form.Control
-                type="email"
-                placeholder="Enter your email here "
-                ref={emailInputRef}
-                required
-                style={{ width: "100%" }}
-                onChange={emailInputChangeHandler}
-                value={email}
-              />
-            </Form.Group>
-            {!isLoading ? (
-              <Button
-                variant="primary"
-                type="submit"
-                style={{ marginTop: "15px" }}
-              >
-                Send Link
-              </Button>
-            ) : (
-              <Button variant="success" style={{ marginTop: "15px" }}>
-                <Spinner animation="border" size="sm" /> Sending...
-              </Button>
-            )}
-          </Form>
-        </Card.Body>
-      </Card>
-    </Container>
+    <Fragment>
+      <Header />
+      <Container className="d-flex justify-content-center my-5">
+        <Card>
+          <Card.Title style={{ textAlign: "center", marginTop: "15px" }}>
+            Reset Password
+          </Card.Title>
+          <Card.Body>
+            <Form onSubmit={resetHandler}>
+              <Form.Group controlId="formBasicEmail">
+                <Form.Control
+                  type="email"
+                  placeholder="Enter your email here "
+                  ref={emailInputRef}
+                  required
+                  style={{ width: "100%" }}
+                  onChange={emailInputChangeHandler}
+                  value={email}
+                />
+              </Form.Group>
+              {!isLoading ? (
+                <Button
+                  variant="primary"
+                  type="submit"
+                  style={{ marginTop: "15px" }}
+                >
+                  Send Link
+                </Button>
+              ) : (
+                <Button variant="success" style={{ marginTop: "15px" }}>
+                  <Spinner animation="border" size="sm" /> Sending...
+                </Button>
+              )}
+            </Form>
+          </Card.Body>
+        </Card>
+      </Container>
+    </Fragment>
   );
 };
 export default Reset;
