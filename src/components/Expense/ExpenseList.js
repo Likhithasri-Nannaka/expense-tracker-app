@@ -39,7 +39,7 @@ const ExpenseList = () => {
     dispatch(expenseActions.setExpenseToDelete(expense));
   };
 
-  const userEmail = email;
+  const userEmail = email || "";
   const emailId = userEmail.replace(/[^a-zA-Z0-9]/g, "");
 
   const handleFetchExpenses = useCallback(async () => {
@@ -163,10 +163,10 @@ const ExpenseList = () => {
       <h5>Total Expense Amount : {totalAmount}</h5>
       <Button
         className="ml-3"
-        variant="success"
+        variant="dark"
         href={`data:text/csv;charset=utf-8,${encodeURIComponent(csvData)}`}
         download="expenses.csv"
-        style={{ marginLeft: "45%" }}
+        style={{ marginLeft: "45%", marginBottom: "5%" }}
       >
         Download Expenses
       </Button>
